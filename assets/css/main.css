@@ -1,0 +1,9275 @@
+/* Mode clair */
+[data-theme="light"] {
+    --bars: #eee;
+    --cross: #666;
+    --blue: #8c90ef;
+    --red: #ef908c;
+}
+
+/* Mode sombre */
+[data-theme="dark"] {
+    --bars: #333;
+    --cross: #eee;
+    --blue: #8c90ef;
+    --red: #ee6460;
+}
+
+input, input[type="radio"] {
+    display: none;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.title {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg-invert);
+}
+
+.board {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template: repeat(3, min-content) / repeat(3, min-content);
+    justify-content: center;
+    align-content: center;
+}
+
+.cell {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    border: solid 4px var(--bars);
+}
+
+.cell--1,
+.cell--2,
+.cell--3 {
+    border-top-color: transparent;
+}
+
+.cell--1,
+.cell--4,
+.cell--7 {
+    border-left-color: transparent;
+}
+
+.cell--3,
+.cell--6,
+.cell--9 {
+    border-right-color: transparent;
+}
+
+.cell--7,
+.cell--8,
+.cell--9 {
+    border-bottom-color: transparent;
+}
+
+.label {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    visibility: hidden;
+}
+.label::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 12px;
+    border-radius: 6px;
+    background: var(--cross);
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.label::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 12px;
+    border-radius: 6px;
+    background: var(--cross);
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.label:hover::before, .label:hover::after {
+    opacity: 1;
+}
+
+.mark {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: none;
+    animation: mark-entrance 0.2s cubic-bezier(0, 0.8, 0.2, 1.2) both;
+}
+
+.mark--o {
+    animation-delay: 0.2s;
+}
+.mark--o::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 12px var(--red);
+    transform: translate(-50%, -50%);
+}
+.mark--x::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 12px;
+    border-radius: 6px;
+    background: var(--blue);
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.mark--x::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 12px;
+    border-radius: 6px;
+    background: var(--blue);
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.bar {
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+.endgame {
+    display: none;
+    position: absolute;
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    width: 300px;
+    height: 300px;
+    z-index: 1000;
+    border-radius: 50px;
+    background: var(--menu-bg);
+    box-shadow: 0 0 120px var(--menu-shadow);
+    transform: translate(-50%, -50%);
+    animation: endgame-entrance 0.3s 0.43s cubic-bezier(0, 0.8, 0.4, 1.2) both;
+}
+
+.msg {
+    display: block;
+    text-align: center;
+    color: var(--bg-invert);
+    margin: 80px;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1.5;
+}
+.msg--o-win, .msg--draw {
+    display: none;
+}
+
+.endgame-newgame {
+    cursor: pointer;
+    background: var(--hover-bg);
+    color: var(--menu-chat-color);
+    padding: 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.5s;
+}
+.endgame-newgame:hover {
+    opacity: 0.8;
+}
+.endgame-newgame:active {
+    transform: scale(0.95);
+}
+
+.newgame {
+    cursor: pointer;
+    background: var(--hover-bg);
+    color: var(--menu-chat-color);
+    padding: 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.5s;
+}
+.newgame:hover {
+    opacity: 0.8;
+}
+.newgame:active {
+    transform: scale(0.95);
+}
+
+/* CSS de l'IA */
+input[value="1"]:checked ~ .board .cell--1 .mark--x {
+    display: block;
+}
+
+input[value="2"]:checked ~ .board .cell--2 .mark--x {
+    display: block;
+}
+
+input[value="3"]:checked ~ .board .cell--3 .mark--x {
+    display: block;
+}
+
+input[value="4"]:checked ~ .board .cell--4 .mark--x {
+    display: block;
+}
+
+input[value="5"]:checked ~ .board .cell--5 .mark--x {
+    display: block;
+}
+
+input[value="6"]:checked ~ .board .cell--6 .mark--x {
+    display: block;
+}
+
+input[value="7"]:checked ~ .board .cell--7 .mark--x {
+    display: block;
+}
+
+input[value="8"]:checked ~ .board .cell--8 .mark--x {
+    display: block;
+}
+
+input[value="9"]:checked ~ .board .cell--9 .mark--x {
+    display: block;
+}
+
+input[name="x0"]:checked ~ .board .label--0 {
+    visibility: hidden;
+}
+
+input[name="x0"]:checked ~ .board .label--1 {
+    visibility: visible;
+}
+
+input[name="x1"]:checked ~ .board .label--1 {
+    visibility: hidden;
+}
+
+input[name="x1"]:checked ~ .board .label--2 {
+    visibility: visible;
+}
+
+input[name="x2"]:checked ~ .board .label--2 {
+    visibility: hidden;
+}
+
+input[name="x2"]:checked ~ .board .label--3 {
+    visibility: visible;
+}
+
+input[name="x3"]:checked ~ .board .label--3 {
+    visibility: hidden;
+}
+
+input[name="x3"]:checked ~ .board .label--4 {
+    visibility: visible;
+}
+
+input[name="x4"]:checked ~ .board .label--4 {
+    visibility: hidden;
+}
+
+input[name="x4"]:checked ~ .endgame,
+input[name="x4"]:checked ~ .endgame .msg--draw {
+    display: block;
+}
+
+.label--0 {
+    visibility: visible;
+}
+
+/* Intelligene Artificielle */
+#x0-1:checked
+~ .board .cell--5 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ .board .cell--2 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ .board .cell--2 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ .board .cell--2 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ .board .cell--2 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--9 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-7:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ .board .cell--2 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-8:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ .board .cell--2 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .board .cell--8 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .board .cell--7 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-1:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ .board .cell--1 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win {
+    display: block;
+}
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-5:checked
+~ .board .cell--8 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-4:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-7:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .board .cell--8 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .board .cell--9 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ .board .cell--5 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .board .cell--8 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .board .cell--7 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--4 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-2:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ .board .cell--5 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ .board .cell--2 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-4:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ .board .cell--2 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win {
+    display: block;
+}
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ .board .cell--2 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ .board .cell--2 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ #x3-1:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-8:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .board .cell--9 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-1:checked
+~ .board .cell--2 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-9:checked
+~ .board .cell--6 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ .board .cell--2 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .board .cell--4 .mark--o,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-3:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ .board .cell--1 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ .board .cell--5 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-3:checked
+~ .board .cell--5 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ .board .cell--6 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-2:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-2:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-2:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ .board .cell--5 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-7:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ .board .cell--5 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win {
+    display: block;
+}
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-8:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ .board .cell--5 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-5:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-5:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-5:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-9:checked
+~ .board .cell--3 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ .board .cell--5 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-4:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ .board .cell--1 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ .board .cell--8 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--9 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .board .cell--6 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ .board .cell--6 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-2:checked
+~ .board .cell--8 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-4:checked
+~ .board .cell--6 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .board .cell--8 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-2:checked
+~ .board .cell--8 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .board .cell--9 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .board .cell--8 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ .board .cell--8 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .board .cell--7 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-9:checked
+~ .board .cell--3 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ .board .cell--8 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-5:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ .board .cell--3 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ .board .cell--4 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-5:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-5:checked
+~ #x3-2:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-5:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-5:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ .board .cell--5 .mark--o {
+    display: block;
+}
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-2:checked
+~ .board .cell--4 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-1:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-5:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-5:checked
+~ #x3-1:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-5:checked
+~ #x3-7:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-5:checked
+~ #x3-9:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-1:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-1:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-5:checked
+~ .board .cell--4 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-1:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-1:checked
+~ #x3-2:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-2:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-2:checked
+~ #x3-1:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-1:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-8:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-7:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-7:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-8:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--9 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-5:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-5:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-5:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-8:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-9:checked
+~ .board .cell--1 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ .board .cell--7 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .board .cell--5 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-5:checked
+~ .board .cell--4 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .board .cell--2 .mark--o,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-6:checked
+~ #x1-9:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ .board .cell--5 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ .board .cell--4 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-2:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ .board .cell--4 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-2:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ .board .cell--4 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win {
+    display: block;
+}
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-1:checked
+~ .board .cell--4 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-2:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-6:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-1:checked
+~ .board .cell--4 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-8:checked
+~ .board .cell--9 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ .board .cell--4 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ #x3-2:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-9:checked
+~ .board .cell--8 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ .board .cell--1 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-7:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ .board .cell--2 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ .board .cell--7 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-5:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-5:checked
+~ #x3-3:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-5:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-1:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-3:checked
+~ .board .cell--7 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-1:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ #x3-9:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-5:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ #x3-1:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-6:checked
+~ #x3-5:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-3:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ .board .cell--7 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-1:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-5:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-5:checked
+~ #x3-1:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-5:checked
+~ #x3-3:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-5:checked
+~ #x3-9:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-1:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-4:checked
+~ #x2-9:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ .board .cell--7 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-3:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-4:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-5:checked
+~ #x2-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-6:checked
+~ .board .cell--7 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-3:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win {
+    display: block;
+}
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ #x3-1:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-3:checked
+~ #x3-5:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-1:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ #x3-1:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ #x3-3:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ #x3-9:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ #x3-9:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-5:checked
+~ #x3-9:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-6:checked
+~ #x2-9:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ .board .cell--9 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-3:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-5:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-1:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-5:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-1:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-5:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ .board .cell--7 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-1:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ .board .cell--6 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-3:checked
+~ #x3-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-3:checked
+~ .board .cell--4 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-5:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-1:checked
+~ .board .cell--5 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-5:checked
+~ .board .cell--1 .mark--o,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-5:checked
+~ .endgame,
+#x0-8:checked
+~ #x1-9:checked
+~ #x2-6:checked
+~ #x3-5:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ .board .cell--5 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-1:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ .board .cell--1 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-2:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-3:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-4:checked
+~ .board .cell--1 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-2:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-3:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-6:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-3:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-7:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win {
+    display: block;
+}
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-4:checked
+~ #x2-8:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-1:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-2:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ .board .cell--1 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-2:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-7:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-4:checked
+~ #x3-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-1:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-2:checked
+~ .board .cell--1 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-4:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-7:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-6:checked
+~ #x2-8:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-7:checked
+~ .board .cell--8 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-1:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ .board .cell--1 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-3:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .board .cell--2 .mark--o,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-7:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-8:checked
+~ .board .cell--7 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-1:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ .board .cell--1 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-3:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-3:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-3:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-2:checked
+~ #x3-6:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ .board .cell--6 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-1:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-1:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-1:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-2:checked
+~ .board .cell--4 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-2:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-2:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-3:checked
+~ #x3-4:checked
+~ .board .cell--1 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-4:checked
+~ .endgame .msg--o-win,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .board .cell--3 .mark--o,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .endgame,
+#x0-9:checked
+~ #x1-8:checked
+~ #x2-6:checked
+~ .endgame .msg--o-win {
+    display: block;
+}
+
+/* Animations */
+@keyframes mark-entrance {
+    from {
+        opacity: 0;
+        transform: scale(0) rotate(-15deg);
+    }
+}
+
+@keyframes endgame-entrance {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+}
