@@ -2,7 +2,7 @@
   <a href="https://morpion.sylvain.pro"><img src="https://morpion.sylvain.pro/assets/images/logo.png" alt="Logo" width="25%" height="auto"/></a>
 
   # Jeu du morpion avec IA
-  [![Version](https://custom-icon-badges.demolab.com/badge/Version%20:-v1.0.0-6479ee?logo=morpion.sylvain.pro&labelColor=23272A)](https://github.com/20syldev/morpion/releases/latest)
+  [![Version](https://custom-icon-badges.demolab.com/badge/Version%20:-v1.1.0-6479ee?logo=morpion.sylvain.pro&labelColor=23272A)](https://github.com/20syldev/morpion/releases/latest)
 </div>
 
 ---
