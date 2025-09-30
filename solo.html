@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Sylvain L. - Morpion vs IA</title>
+    <link rel="stylesheet" href="https://sylvain.pro/assets/css/fontawesome.css"/>
+    <link rel="stylesheet" href="https://sylvain.pro/assets/css/bulma.css"/>
+    <link rel="stylesheet" href="https://sylvain.pro/assets/css/index.css"/>
+    <link rel="stylesheet" href="assets/css/main.css"/>
+    <link rel="stylesheet" href="assets/css/modules/solo.css"/>
+    <link rel="icon shortcut" href="assets/images/logo.png"/>
+</head>
+<body>
+    <!-- Notification de changement de thème -->
+    <div class="theme-notif"></div>
+
+    <!-- Bouton pour changer de thème -->
+    <button class="switch-btn"></button>
+
+    <!-- Bouton retourner à l'accueil -->
+    <a href="/" class="home-btn"><i class="fa-solid fa-home"></i></a>
+
+    <!-- Jeu -->
+    <section class="section">
+        <div class="game-container">
+            <h1 class="title">Morpion vs IA</h1>
+            <p class="subtitle">Jouez contre l'ordinateur</p>
+
+            <!-- Sélection de difficulté -->
+            <div class="difficulty-selection" id="difficultySelection">
+                <h3>Choisissez la difficulté :</h3>
+                <div class="difficulty-buttons">
+                    <button class="btn btn-difficulty" data-difficulty="easy">Facile</button>
+                    <button class="btn btn-difficulty" data-difficulty="normal">Normal</button>
+                    <button class="btn btn-difficulty" data-difficulty="hard">Difficile</button>
+                </div>
+            </div>
+
+            <!-- Zone de jeu (cachée au début) -->
+            <div class="game-zone" id="gameZone" style="display: none;">
+                <div class="game-info">
+                    Au tour de <span class="current-player" id="currentPlayer">Vous (X)</span>
+                </div>
+
+                <div class="board" id="board">
+                    <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                    <div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div>
+                    <div class="cell" data-index="4"></div>
+                    <div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div>
+                    <div class="cell" data-index="7"></div>
+                    <div class="cell" data-index="8"></div>
+                </div>
+
+                <div class="game-over" id="gameOver"></div>
+
+                <div class="game-actions">
+                    <button class="btn" id="resetBtn">Nouvelle partie</button>
+                    <a class="btn btn-secondary" href="/">Retour au menu</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bas de page -->
+    <div class="has-text-centered p-4 bottom">
+        <p><strong>
+            <a href="/">morpion.sylvain.pro</a> &copy; 2025. Tous droits réservés.
+        </strong></p>
+    </div>
+
+    <!-- Charger le Js -->
+    <script type="text/javascript" src="https://sylvain.pro/assets/js/theme.js"></script>
+    <script type="module" src="assets/js/solo.js"></script>
+</body>
+</html>
