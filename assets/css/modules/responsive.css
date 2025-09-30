@@ -1,0 +1,40 @@
+/* - - - - - - - Responsive - - - - - - - */
+
+/* Solo */
+@media (max-width: 600px) {
+    .game-container {
+        padding: 1rem;
+    }
+
+    .difficulty-buttons {
+        flex-direction: column;
+    }
+
+    .btn-difficulty {
+        width: 100%;
+    }
+
+    .cell {
+        height: 80px;
+        width: 80px;
+    }
+}
+
+/* Multiplayer */
+@media (max-width: 768px) {
+    .multiplayer-container {
+        padding: 1rem;
+    }
+
+    .game-setup-box {
+        padding: 1.5rem;
+    }
+
+    .game-field input {
+        max-width: 100%;
+    }
+
+    .game-code-display {
+        font-size: 1.2rem;
+    }
+}

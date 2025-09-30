@@ -1,0 +1,164 @@
+/* - - - - - - - Grid - - - - - - - */
+
+@import './animation.css';
+
+/* Plateau de jeu */
+.board {
+    grid-template: repeat(3, min-content) / repeat(3, min-content);
+    justify-content: center;
+    align-content: center;
+    margin: 2rem auto;
+    display: grid;
+}
+
+.cell {
+    border: solid 4px var(--bars);
+    transition: all 0.2s ease;
+    position: relative;
+    cursor: pointer;
+    height: 88px;
+    width: 88px;
+}
+
+/* Bordures du plateau */
+.cell:nth-child(-n+3) {
+    border-top-color: transparent;
+}
+.cell:nth-child(3n+1) {
+    border-left-color: transparent;
+}
+.cell:nth-child(3n) {
+    border-right-color: transparent;
+}
+.cell:nth-child(n+7) {
+    border-bottom-color: transparent;
+}
+
+/* Cellule occupée */
+.cell.occupied { cursor: not-allowed; }
+
+/* Cellule gagnante */
+.cell.winning { animation: winning 0.8s ease-in-out; }
+.cell.winning .mark { animation: winning-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+
+/* Preview du symbole */
+.cell:not(.occupied):not(.cell--x):not(.cell--o)::before,
+.cell:not(.occupied):not(.cell--x):not(.cell--o)::after {
+    transition: opacity 0.2s;
+    position: absolute;
+    content: '';
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+}
+
+.cell:not(.occupied):not(.cell--x):not(.cell--o):hover::before,
+.cell:not(.occupied):not(.cell--x):not(.cell--o):hover::after {
+    opacity: 1;
+}
+
+/* Hover pour X */
+.cell:not(.occupied):not(.cell--x):not(.cell--o):hover::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+    background: var(--blue-hover);
+    transform-origin: center;
+    border-radius: 6px;
+    height: 12px;
+    width: 80%;
+}
+.cell:not(.occupied):not(.cell--x):not(.cell--o):hover::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+    background: var(--blue-hover);
+    transform-origin: center;
+    border-radius: 6px;
+    height: 12px;
+    width: 80%;
+}
+
+/* Hover pour O */
+.player-o-turn .cell:not(.occupied):not(.cell--x):not(.cell--o):hover::before,
+.board.player-o .cell:not(.occupied):not(.cell--x):not(.cell--o):hover::before {
+    transform: translate(-50%, -50%) rotate(0deg);
+    box-shadow: inset 0 0 0 12px var(--red-hover);
+    background: none;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+}
+.player-o-turn .cell:not(.occupied):not(.cell--x):not(.cell--o):hover::after,
+.board.player-o .cell:not(.occupied):not(.cell--x):not(.cell--o):hover::after {
+    display: none;
+}
+
+/* Spectator mode */
+.board.spectator .cell:hover::before,
+.board.spectator .cell:hover::after {
+    opacity: 0;
+}
+
+/* Marques X et O */
+.mark {
+    animation: pop 0.2s cubic-bezier(0, 0.8, 0.2, 1.2) both;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+
+.mark.o::before,
+.mark--o::before {
+    box-shadow: inset 0 0 0 12px var(--red);
+    transform: translate(-50%, -50%);
+    position: absolute;
+    content: '';
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+}
+
+.mark.x::before,
+.mark--x::before {
+    background: var(--blue);
+    transform: translate(-50%, -50%) rotate(45deg);
+    transform-origin: center;
+    position: absolute;
+    content: '';
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 12px;
+    border-radius: 6px;
+}
+.mark.x::after,
+.mark--x::after {
+    background: var(--blue);
+    transform: translate(-50%, -50%) rotate(-45deg);
+    transform-origin: center;
+    position: absolute;
+    content: '';
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 12px;
+    border-radius: 6px;
+}
+
+/* Display marks */
+.cell--x .mark--x,
+.cell--o .mark--o {
+    display: block;
+}
+
+.mark--x,
+.mark--o {
+    animation: pop 0.2s cubic-bezier(0, 0.8, 0.2, 1.2) both;
+    position: absolute;
+    display: none;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}

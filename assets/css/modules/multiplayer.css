@@ -1,0 +1,205 @@
+/* - - - - - - - Multiplayer - - - - - - - */
+
+@import './grid.css';
+
+/* Utilitaire */
+.is-hidden { display: none !important; }
+
+/* Conteneur principal centré */
+.multiplayer-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Boîte pour les informations de connexion */
+.game-setup-box {
+    border: 1px solid var(--menu-shadow);
+    background: var(--menu-bg);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    padding: 2rem;
+}
+
+/* Champs de saisie */
+.game-field {
+    margin-bottom: 1.5rem;
+}
+
+.game-field label {
+    color: var(--bg-invert);
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.game-field input {
+    border: 1px solid var(--menu-shadow);
+    background: var(--menu-chat-bg);
+    color: var(--bg-invert);
+    margin: 0 auto;
+    display: block;
+    width: 100%;
+    font-size: 1rem;
+    max-width: 300px;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+}
+
+.game-field input:focus {
+    box-shadow: 0 0 0 2px var(--input-border-focus);
+    border-color: var(--input-border-focus);
+    outline: none;
+}
+
+/* Bouton principal */
+.game-start-btn {
+    background: var(--button-bg);
+    color: var(--button-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+}
+
+.game-start-btn:hover {
+    background: var(--hover-bg);
+    transform: translateY(-2px);
+}
+
+.game-code-info {
+    color: var(--menu-chat-color);
+    align-items: center;
+    display: flex;
+    gap: 0;
+    font-size: 0.9rem;
+}
+.game-code-info > span {
+    align-items: center;
+    display: flex;
+    gap: 0;
+}
+
+.game-code-display {
+    color: var(--bg-invert);
+    border: 2px solid var(--bars);
+    background: var(--menu-chat-bg);
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 2px 4px #0000001a;
+    transition: all 0.2s ease;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    width: 10.5rem;
+    height: 2.5rem;
+    margin: 0 0.5rem;
+    font-size: 1.3rem;
+    border-radius: 8px;
+    letter-spacing: 2px;
+    padding: 0.5rem 1.5rem;
+}
+.game-code-display:hover {
+    border-color: var(--blue);
+    background: var(--hover-bg);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px #00000026;
+}
+.game-code-display:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px #0000001a;
+}
+
+/* Plateau de jeu centré */
+.game-board-container {
+    text-align: center;
+    margin: 0 auto;
+    max-width: 500px;
+}
+
+/* Status du jeu */
+.game-status {
+    background: var(--menu-bg);
+    color: var(--bg-invert);
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1rem;
+}
+
+/* Boutons d'action */
+.game-actions {
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.game-btn {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+}
+.game-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.game-btn--primary {
+    background: var(--button-bg);
+    color: var(--button-color);
+}
+
+.game-btn--secondary {
+    border: 1px solid var(--menu-shadow);
+    background: var(--menu-chat-bg);
+    color: var(--bg-invert);
+}
+
+.share-btn { margin-top: 0.5rem; }
+
+/* Messages de fin */
+.game-result {
+    animation: fade-in 0.5s ease;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+.msg {
+    font-weight: bold;
+    display: block;
+    color: white;
+    padding: 1rem;
+    font-size: 1.3rem;
+    border-radius: 10px;
+}
+
+.msg--win { background: #27ae60; }
+.msg--lose { background: #e74c3c; }
+.msg--draw { background: #f39c12; }
+
+/* Loading dots animation */
+.loading-dots {
+    display: inline-flex;
+    gap: 2px;
+}
+.loading-dots span {
+    animation: bounce 1.4s infinite ease-in-out;
+}
+.loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+.loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}

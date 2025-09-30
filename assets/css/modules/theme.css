@@ -1,0 +1,21 @@
+/* - - - - - - - Theme - - - - - - - */
+
+/* Mode clair */
+[data-theme="light"] {
+    --bars: #eee;
+    --cross: #666;
+    --blue: #8c90ef;
+    --blue-hover: #c3c5fd;
+    --red: #ef908c;
+    --red-hover: #f5bebe80;
+}
+
+/* Mode sombre */
+[data-theme="dark"] {
+    --bars: #333;
+    --cross: #eee;
+    --blue: #8c90ef;
+    --blue-hover: #50529b;
+    --red: #ee6460;
+    --red-hover: #ee646080;
+}

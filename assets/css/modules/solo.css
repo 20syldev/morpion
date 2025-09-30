@@ -1,0 +1,108 @@
+/* - - - - - - - Solo - - - - - - - */
+
+@import './grid.css';
+
+/* Layout du jeu solo */
+.game-container {
+    text-align: center;
+    margin: 2rem auto;
+    max-width: 500px;
+    padding: 2rem;
+}
+
+.title {
+    color: var(--bg-invert);
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+}
+
+.subtitle {
+    color: var(--cross);
+    margin-bottom: 2rem;
+}
+
+.game-info {
+    color: var(--bg-invert);
+    font-size: 1.2rem;
+    margin: 1.5rem 0;
+    font-weight: 600;
+}
+
+.current-player { color: var(--blue); }
+.current-player.player-o { color: var(--red); }
+
+/* Messages de fin */
+.game-over {
+    animation: message-in 0.5s ease;
+    background: #27ae60;
+    font-weight: bold;
+    color: white;
+    display: none;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    font-size: 1.3rem;
+    border-radius: 10px;
+}
+.game-over.draw {
+    background: #f39c12;
+    color: white;
+}
+.game-over.show {
+    display: block;
+}
+
+/* Boutons */
+.game-actions { margin-top: 2rem; }
+
+.btn {
+    background: var(--blue);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    color: white;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0.5rem;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+}
+.btn:hover {
+    background: #2366d1;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+}
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+/* Sélection de difficulté */
+.difficulty-selection {
+    margin: 2rem 0;
+}
+.difficulty-selection h3 {
+    color: var(--bg-invert);
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+.difficulty-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-difficulty {
+    background: var(--blue);
+    min-width: 120px;
+}
+.btn-difficulty:hover { opacity: 0.9; }
+
+.btn-difficulty[data-difficulty="easy"] { background: #48c774; }
+.btn-difficulty[data-difficulty="normal"] {
+    background: #ffdd57;
+    color: #363636;
+}
+.btn-difficulty[data-difficulty="hard"] { background: #f14668; }
