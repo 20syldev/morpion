@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Sylvain L. - Morpion Multijoueur</title>
+    <link rel="stylesheet" href="https://sylvain.pro/assets/css/fontawesome.css"/>
+    <link rel="stylesheet" href="https://sylvain.pro/assets/css/bulma.css"/>
+    <link rel="stylesheet" href="https://sylvain.pro/assets/css/index.css"/>
+    <link rel="stylesheet" href="assets/css/main.css"/>
+    <link rel="stylesheet" href="assets/css/modules/multiplayer.css"/>
+    <link rel="icon shortcut" href="assets/images/logo.png"/>
+</head>
+<body>
+    <!-- Notification de changement de thème -->
+    <div class="theme-notif"></div>
+
+    <!-- Bouton pour changer de thème -->
+    <button class="switch-btn"></button>
+
+    <!-- Bouton retourner à l'accueil -->
+    <a href="https://sylvain.pro" class="home-btn"><i class="fa-solid fa-home"></i></a>
+
+    <!-- Interface de jeu -->
+    <section class="section">
+        <form>
+            <div class="multiplayer-container">
+                <!-- Interface de connexion/code -->
+                <div class="has-text-centered" id="gameSetup">
+                    <h1 class="title has-text-centered mt-6">Morpion Multijoueur</h1>
+                    <p class="subtitle has-text-centered">Jouez au morpion contre un autre joueur en ligne.</p>
+
+                    <div class="game-setup-box">
+                        <div class="game-field">
+                            <label>Votre nom d'utilisateur</label>
+                            <input type="text" placeholder="Entrez votre nom" maxlength="20" id="username">
+                        </div>
+
+                        <div class="game-field">
+                            <label>Code de la partie (optionnel)</label>
+                            <input type="text" placeholder="Ex: AB123" maxlength="6" id="gameCode">
+                        </div>
+
+                        <button class="game-start-btn" type="button" id="startGame">Commencer à jouer</button>
+                    </div>
+                </div>
+
+                <!-- Plateau de jeu -->
+                <div class="game-board-container is-hidden" id="gameBoard">
+                    <div class="game-status">
+                        <span id="gameStatus">En attente du joueur...</span>
+                    </div>
+
+                    <div class="board mt-6">
+                        <div class="cell cell--1" data-position="1-1">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                        <div class="cell cell--2" data-position="1-2">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                        <div class="cell cell--3" data-position="1-3">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                        <div class="cell cell--4" data-position="2-1">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                        <div class="cell cell--5" data-position="2-2">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                        <div class="cell cell--6" data-position="2-3">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                        <div class="cell cell--7" data-position="3-1">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                        <div class="cell cell--8" data-position="3-2">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                        <div class="cell cell--9" data-position="3-3">
+                            <div class="mark mark--x"></div>
+                            <div class="mark mark--o"></div>
+                        </div>
+                    </div>
+
+                    <div class="game-result is-hidden">
+                        <span class="msg msg--win">Vous avez gagné !</span>
+                        <span class="msg msg--lose">Vous avez perdu !</span>
+                        <span class="msg msg--draw">Égalité !</span>
+                    </div>
+
+                    <div class="game-actions">
+                        <button class="game-btn game-btn--primary" type="button" id="newGame">Nouvelle partie</button>
+                        <div class="game-code-info">
+                            <span>Code: <span class="game-code-display" title="Cliquer pour copier" id="gameCodeDisplay">
+                                <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+                            </span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </section>
+
+    <!-- Bas de page -->
+    <div class="has-text-centered p-4 bottom">
+        <p><strong>
+            <a href="/">morpion.sylvain.pro</a> &copy; 2025. Tous droits réservés.
+        </strong></p>
+    </div>
+
+    <!-- Charger le Js -->
+    <script type="text/javascript" src="https://sylvain.pro/assets/js/theme.js"></script>
+    <script type="module" src="assets/js/multiplayer.js"></script>
+</body>
+</html>
