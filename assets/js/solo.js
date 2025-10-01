@@ -15,7 +15,7 @@ let aiSymbol = 'O';
 const difficultySelection = document.getElementById('difficultySelection');
 const gameZone = document.getElementById('gameZone');
 const board = document.getElementById('board');
-const currentPlayerElement = document.getElementById('currentPlayer');
+const player = document.getElementById('player');
 const gameOver = document.getElementById('gameOver');
 const resetBtn = document.getElementById('resetBtn');
 
@@ -38,7 +38,7 @@ function startGame() {
     difficultySelection.style.display = 'none';
     gameZone.style.display = 'block';
     setGameActive(true);
-    updateStatus(currentPlayerElement, 'Vous (X)');
+    updateStatus(player, 'Vous (X)');
 }
 
 // Gestion du clic sur une case
@@ -61,13 +61,11 @@ function handleCellClick(e) {
     }
 
     // Vérifier l'égalité
-    if (checkDraw(gameBoard)) {
-        endGame(gameOver, 'Égalité !', true);
-        return;
-    }
+    if (checkDraw(gameBoard)) return endGame(gameOver, 'Égalité !', true);
 
     // Tour de l'IA
-    updateStatus(currentPlayerElement, 'IA (O)');
+    updateStatus(player, 'IA (O)');
+    player.className = 'current-player player-o';
     setGameActive(false);
 
     setTimeout(() => {
@@ -84,7 +82,8 @@ function handleCellClick(e) {
         if (checkDraw(gameBoard)) return endGame(gameOver, 'Égalité !', true);
 
         setGameActive(true);
-        updateStatus(currentPlayerElement, 'Vous (X)');
+        updateStatus(player, 'Vous (X)');
+        player.className = 'current-player';
     }, 500);
 }
 

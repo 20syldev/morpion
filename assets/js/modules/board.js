@@ -1,7 +1,7 @@
 /**
  * Met à jour l'affichage d'une cellule avec un symbole
  *
- * @param {HTMLElement} cell - L'élément de la cellule
+ * @param {HTMLElement} cell - Élément de la cellule
  * @param {string} symbol - 'X' ou 'O'
  */
 export function updateCell(cell, symbol) {
@@ -15,7 +15,7 @@ export function updateCell(cell, symbol) {
 /**
  * Met à jour l'affichage d'une cellule avec les classes CSS
  *
- * @param {HTMLElement} cell - L'élément de la cellule
+ * @param {HTMLElement} cell - Élément de la cellule
  * @param {string} symbol - 'x' ou 'o' (minuscule)
  */
 export function updateCellClass(cell, symbol) {
@@ -25,7 +25,7 @@ export function updateCellClass(cell, symbol) {
 /**
  * Nettoie toutes les cellules du plateau
  *
- * @param {HTMLElement} board - L'élément contenant le plateau
+ * @param {HTMLElement} board - Élément contenant le plateau
  */
 export function clearBoard(board) {
     const cells = board.querySelectorAll('.cell');
@@ -44,8 +44,8 @@ export function clearBoard(board) {
 /**
  * Met en surbrillance les cellules gagnantes
  *
- * @param {HTMLElement} board - L'élément contenant le plateau
- * @param {Array} indices - Les indices des cellules gagnantes
+ * @param {HTMLElement} board - Élément contenant le plateau
+ * @param {Array} indices - Indices des cellules gagnantes
  */
 export function highlightWinningCells(board, indices) {
     const cells = Array.from(board.children).filter(el => el.classList.contains('cell'));
@@ -59,11 +59,9 @@ export function highlightWinningCells(board, indices) {
 /**
  * Met à jour l'affichage du joueur actuel
  *
- * @param {HTMLElement} element - L'élément où afficher le texte
- * @param {string} text - Le texte à afficher
+ * @param {HTMLElement} el - Élément où afficher le texte
+ * @param {string} text - Texte à afficher
  */
-export function updateStatus(element, text) {
-    if (element) {
-        element.textContent = text;
-    }
+export function updateStatus(el, text) {
+    if (el) el.textContent = text;
 }

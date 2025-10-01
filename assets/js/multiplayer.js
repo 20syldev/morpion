@@ -21,50 +21,50 @@ class Multiplayer {
     }
 
     initializeElements() {
-        this.usernameInput = document.getElementById('username');
-        this.gameCodeInput = document.getElementById('gameCode');
-        this.startGameBtn = document.getElementById('startGame');
-        this.gameSetup = document.getElementById('gameSetup');
+        this.username = document.getElementById('username');
+        this.code = document.getElementById('gameCode');
+        this.startBtn = document.getElementById('startGame');
+        this.setup = document.getElementById('gameSetup');
 
-        this.gameBoard = document.getElementById('gameBoard');
-        this.gameStatus = document.getElementById('gameStatus');
+        this.game = document.getElementById('gameBoard');
+        this.status = document.getElementById('gameStatus');
         this.cells = document.querySelectorAll('.cell');
-        this.newGameBtn = document.getElementById('newGame');
-        this.gameCodeDisplay = document.getElementById('gameCodeDisplay');
-        this.gameResult = document.querySelector('.game-result');
+        this.newBtn = document.getElementById('newGame');
+        this.codeDisplay = document.getElementById('gameCodeDisplay');
+        this.result = document.querySelector('.game-result');
         this.board = document.querySelector('.board');
     }
 
     bindEvents() {
-        this.startGameBtn.addEventListener('click', (e) => {
+        this.startBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.startGame();
         });
-        this.newGameBtn.addEventListener('click', (e) => {
+        this.newBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.resetGame();
         });
-        this.gameCodeDisplay.addEventListener('click', () => this.shareGame());
+        this.codeDisplay.addEventListener('click', () => this.shareGame());
 
         this.cells.forEach(cell => {
             cell.addEventListener('click', (e) => this.handleCellClick(e));
         });
 
-        this.usernameInput.addEventListener('keypress', (e) => {
+        this.username.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.startGame();
         });
-        this.gameCodeInput.addEventListener('keypress', (e) => {
+        this.code.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.startGame();
         });
 
-        this.gameCodeInput.addEventListener('input', () => this.updateButtonText());
+        this.code.addEventListener('input', () => this.updateButtonText());
 
         this.updateButtonText();
     }
 
     updateButtonText() {
-        const gameCode = this.gameCodeInput.value.trim();
-        this.startGameBtn.textContent = gameCode ? 'Rejoindre la partie' : 'Créer une partie';
+        const gameCode = this.code.value.trim();
+        this.startBtn.textContent = gameCode ? 'Rejoindre la partie' : 'Créer une partie';
     }
 
     checkUrlParams() {
@@ -74,12 +74,12 @@ class Multiplayer {
         const savedUsername = localStorage.getItem('username');
 
         if (gameCode) {
-            this.gameCodeInput.value = gameCode;
+            this.code.value = gameCode;
             this.updateButtonText();
         }
 
         if (savedUsername) {
-            this.usernameInput.value = savedUsername;
+            this.username.value = savedUsername;
         }
 
         if (gameCode && savedUsername) {
@@ -96,12 +96,12 @@ class Multiplayer {
     shareGame() {
         const textToCopy = this.gameCode;
         this.isCopying = true;
-        const originalText = this.gameCodeDisplay.textContent;
+        const originalText = this.codeDisplay.textContent;
 
         navigator.clipboard.writeText(textToCopy).then(() => {
-            this.gameCodeDisplay.innerHTML = '<i class="fa fa-check"></i>';
+            this.codeDisplay.innerHTML = '<i class="fa fa-check"></i>';
             setTimeout(() => {
-                this.gameCodeDisplay.textContent = originalText;
+                this.codeDisplay.textContent = originalText;
                 this.isCopying = false;
             }, 2500);
         }).catch(() => {
@@ -112,21 +112,21 @@ class Multiplayer {
             document.execCommand('copy');
             document.body.removeChild(tempInput);
 
-            this.gameCodeDisplay.innerHTML = '<i class="fa fa-check"></i>';
+            this.codeDisplay.innerHTML = '<i class="fa fa-check"></i>';
             setTimeout(() => {
-                this.gameCodeDisplay.textContent = originalText;
+                this.codeDisplay.textContent = originalText;
                 this.isCopying = false;
             }, 2500);
         });
     }
 
     async startGame() {
-        const username = this.usernameInput.value.trim();
-        const gameCode = this.gameCodeInput.value.trim();
+        const username = this.username.value.trim();
+        const gameCode = this.code.value.trim();
 
         if (!username) {
-            this.usernameInput.style.borderColor = '#ff4444';
-            this.usernameInput.focus();
+            this.username.style.borderColor = '#ff4444';
+            this.username.focus();
             return;
         }
 
@@ -180,15 +180,15 @@ class Multiplayer {
     }
 
     showGameBoard() {
-        this.gameSetup.classList.add('is-hidden');
-        this.gameBoard.classList.remove('is-hidden');
-        if (this.gameCode) this.gameCodeDisplay.textContent = this.gameCode;
+        this.setup.classList.add('is-hidden');
+        this.game.classList.remove('is-hidden');
+        if (this.gameCode) this.codeDisplay.textContent = this.gameCode;
     }
 
     backToSetup() {
         this.stopPolling();
-        this.gameBoard.classList.add('is-hidden');
-        this.gameSetup.classList.remove('is-hidden');
+        this.game.classList.add('is-hidden');
+        this.setup.classList.remove('is-hidden');
         this.resetGameState();
     }
 
@@ -206,7 +206,7 @@ class Multiplayer {
         this.opponentSymbol = '';
         this.moves = [];
         this.foundMessageShown = false;
-        this.gameResult.classList.add('is-hidden');
+        this.result.classList.add('is-hidden');
     }
 
     clearBoardUI() {
@@ -226,7 +226,7 @@ class Multiplayer {
             if (success) {
                 updateCellClass(cell, this.mySymbol);
                 this.isMyTurn = false;
-                updateStatus(this.gameStatus, 'En attente du joueur adverse...');
+                updateStatus(this.status, 'En attente du joueur adverse...');
             }
         } catch (error) {
             console.error('Erreur lors du mouvement:', error);
@@ -249,7 +249,7 @@ class Multiplayer {
                 return true;
             } else {
                 console.error('Erreur API:', data);
-                updateStatus(this.gameStatus, data.error || 'Erreur lors du mouvement');
+                updateStatus(this.status, data.error || 'Erreur lors du mouvement');
                 return false;
             }
         } catch (error) {
@@ -284,8 +284,8 @@ class Multiplayer {
                 this.gameCode = gameData.id;
                 this.updateUrl();
             }
-            if (this.gameCodeDisplay && !this.isCopying) {
-                this.gameCodeDisplay.textContent = this.gameCode;
+            if (this.codeDisplay && !this.isCopying) {
+                this.codeDisplay.textContent = this.gameCode;
             }
         }
 
@@ -310,7 +310,7 @@ class Multiplayer {
             this.isMyTurn = false;
             this.mySymbol = 'x';
             this.opponentSymbol = 'o';
-            updateStatus(this.gameStatus, 'En attente d\'un autre joueur...');
+            updateStatus(this.status, 'En attente d\'un autre joueur...');
             this.updateBoardHover(false);
         } else if (players.length === 0) {
             this.isMyTurn = connectedPlayers[0] === this.username.toLowerCase();
@@ -318,9 +318,9 @@ class Multiplayer {
             this.opponentSymbol = this.isMyTurn ? 'o' : 'x';
 
             if (isSpectator) {
-                updateStatus(this.gameStatus, `Tour de ${connectedPlayers[0]} (X)`);
+                updateStatus(this.status, `Tour de ${connectedPlayers[0]} (X)`);
             } else {
-                updateStatus(this.gameStatus, this.isMyTurn ? 'À votre tour !' : 'En attente du joueur adverse...');
+                updateStatus(this.status, this.isMyTurn ? 'À votre tour !' : 'En attente du joueur adverse...');
             }
             this.updateBoardHover(isSpectator);
         } else if (players.length === 1) {
@@ -329,9 +329,9 @@ class Multiplayer {
                 this.mySymbol = 'x';
                 this.opponentSymbol = 'o';
                 if (isSpectator) {
-                    updateStatus(this.gameStatus, `Tour de ${connectedPlayers[1]} (O)`);
+                    updateStatus(this.status, `Tour de ${connectedPlayers[1]} (O)`);
                 } else {
-                    updateStatus(this.gameStatus, 'En attente du joueur adverse...');
+                    updateStatus(this.status, 'En attente du joueur adverse...');
                 }
                 this.updateBoardHover(isSpectator);
             } else {
@@ -339,9 +339,9 @@ class Multiplayer {
                 this.mySymbol = 'o';
                 this.opponentSymbol = 'x';
                 if (isSpectator) {
-                    updateStatus(this.gameStatus, `Tour de ${connectedPlayers[1]} (O)`);
+                    updateStatus(this.status, `Tour de ${connectedPlayers[1]} (O)`);
                 } else {
-                    updateStatus(this.gameStatus, 'À votre tour !');
+                    updateStatus(this.status, 'À votre tour !');
                 }
                 this.updateBoardHover(isSpectator);
             }
@@ -370,9 +370,9 @@ class Multiplayer {
             if (isSpectator) {
                 const currentPlayer = currentTurnIsX ? connectedPlayers[0] : connectedPlayers[1];
                 const currentSymbol = currentTurnIsX ? 'X' : 'O';
-                updateStatus(this.gameStatus, `Tour de ${currentPlayer} (${currentSymbol})`);
+                updateStatus(this.status, `Tour de ${currentPlayer} (${currentSymbol})`);
             } else {
-                updateStatus(this.gameStatus, this.isMyTurn ? 'À votre tour !' : 'En attente du joueur adverse...');
+                updateStatus(this.status, this.isMyTurn ? 'À votre tour !' : 'En attente du joueur adverse...');
             }
         }
 
@@ -431,14 +431,14 @@ class Multiplayer {
             messageClass = 'msg--lose';
         }
 
-        updateStatus(this.gameStatus, 'Partie terminée');
-        this.gameResult.classList.remove('is-hidden');
+        updateStatus(this.status, 'Partie terminée');
+        this.result.classList.remove('is-hidden');
 
-        this.gameResult.querySelectorAll('.msg').forEach(msg => {
+        this.result.querySelectorAll('.msg').forEach(msg => {
             msg.style.display = 'none';
         });
 
-        const targetMsg = this.gameResult.querySelector(`.${messageClass}`);
+        const targetMsg = this.result.querySelector(`.${messageClass}`);
         if (targetMsg) targetMsg.style.display = 'block';
     }
 
