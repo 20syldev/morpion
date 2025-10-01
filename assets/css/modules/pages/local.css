@@ -1,6 +1,6 @@
-/* - - - - - - - Grid - - - - - - - */
+/* - - - - - - - Local - - - - - - - */
 
-@import './animation.css';
+@import '../common/animation.css';
 
 /* Plateau de jeu */
 .board {

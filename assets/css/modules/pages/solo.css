@@ -1,0 +1,33 @@
+/* - - - - - - - Solo - - - - - - - */
+
+@import './local.css';
+
+/* Sélection de difficulté */
+.difficulty-selection {
+    margin: 2rem 0;
+}
+.difficulty-selection h3 {
+    color: var(--bg-invert);
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+}
+.difficulty-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-difficulty {
+    min-width: 120px;
+}
+.btn-difficulty[data-difficulty="easy"] {
+    background: #48c774;
+}
+.btn-difficulty[data-difficulty="normal"] {
+    background: #ffdd57;
+    color: #363636;
+}
+.btn-difficulty[data-difficulty="hard"] {
+    background: #f14668;
+}

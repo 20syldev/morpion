@@ -1,0 +1,49 @@
+/* - - - - - - - Game Links - - - - - - - */
+
+.game-link {
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    text-decoration: none;
+    cursor: pointer;
+    display: block;
+    border: none;
+    width: 100%;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    padding: 1.25rem 2rem;
+}
+.game-link i {
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+}
+
+.game-link.solo {
+    background: #3273dc;
+    color: white;
+}
+.game-link.solo:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.9);
+    text-decoration: none;
+}
+
+.game-link.local {
+    background: #ffdd57;
+    color: #363636;
+}
+.game-link.local:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.9);
+    text-decoration: none;
+}
+
+.game-link.multi {
+    background: #48c774;
+    color: white;
+}
+.game-link.multi:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.9);
+    text-decoration: none;
+}

@@ -1,97 +1,11 @@
-@import './modules/theme.css';
+/* Common */
+@import './modules/common/theme.css';
+@import './modules/common/animation.css';
+@import './modules/common/responsive.css';
+@import './modules/common/game.css';
+@import './modules/common/button.css';
 
-/* Reset pour éviter les conflits */
-.section.menu-container {
-    height: auto !important;
-    padding: 2rem 1.5rem;
-}
-
-/* Styles pour le menu principal */
-.menu-container {
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    display: flex;
-    min-height: 80vh;
-}
-
-.game-menu {
-    box-shadow: 0 8px 32px var(--menu-shadow);
-    background: var(--menu-bg);
-    text-align: center;
-    position: relative;
-    padding: 3rem;
-    width: 90%;
-    z-index: 10;
-    max-width: 500px;
-    border-radius: 15px;
-}
-.game-menu .title {
-    display: block;
-    flex: none;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-.game-menu .subtitle {
-    color: var(--cross);
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-}
-
-.menu-buttons {
-    flex-direction: column;
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
-
-.game-link {
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-    text-decoration: none;
-    cursor: pointer;
-    display: block;
-    border: none;
-    width: 100%;
-    font-weight: 600;
-    font-size: 1.1rem;
-    border-radius: 8px;
-    padding: 1.25rem 2rem;
-}
-
-.game-link i {
-    margin-right: 0.75rem;
-    font-size: 1.2rem;
-}
-.game-link.solo {
-    background: #3273dc;
-    color: white;
-}
-.game-link.solo:hover {
-    transform: translateY(-2px);
-    text-decoration: none;
-    background: #2366d1;
-    color: white;
-}
-
-.game-link.local {
-    background: #ffdd57;
-    color: #363636;
-}
-.game-link.local:hover {
-    transform: translateY(-2px);
-    text-decoration: none;
-    background: #ffd83d;
-    color: #363636;
-}
-
-.game-link.multi {
-    background: #48c774;
-    color: white;
-}
-.game-link.multi:hover {
-    transform: translateY(-2px);
-    text-decoration: none;
-    background: #3ec46d;
-    color: white;
-}
+/* Menu */
+@import './modules/menu/section.css';
+@import './modules/menu/menu.css';
+@import './modules/menu/link.css';

@@ -1,0 +1,34 @@
+/* - - - - - - - Responsive - - - - - - - */
+
+/* Mobile */
+@media (max-width: 600px) {
+    .game-menu {
+        background: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+
+    .game-container {
+        max-width: 100%;
+        padding: 1rem;
+    }
+
+    .game-field input { max-width: 100%; }
+    .game-actions {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .difficulty-buttons { flex-direction: column; }
+
+    .btn-difficulty,
+    .btn { width: 100%; }
+}
+
+/* Désactiver le hover des cellules */
+@media (hover: none) {
+    .cell:not(.occupied):not(.cell--x):not(.cell--o):hover::before,
+    .cell:not(.occupied):not(.cell--x):not(.cell--o):hover::after {
+        opacity: 0 !important;
+    }
+}

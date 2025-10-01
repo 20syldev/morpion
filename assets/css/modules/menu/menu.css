@@ -1,0 +1,20 @@
+/* - - - - - - - Game Menu - - - - - - - */
+
+.game-menu {
+    box-shadow: 0 8px 32px var(--menu-shadow);
+    background: var(--menu-bg);
+    position: relative;
+    text-align: center;
+    z-index: 10;
+    width: 90%;
+    padding: 3rem;
+    max-width: 500px;
+    border-radius: 15px;
+}
+
+.menu-buttons {
+    flex-direction: column;
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}

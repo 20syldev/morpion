@@ -1,18 +1,18 @@
 /* - - - - - - - Multiplayer - - - - - - - */
 
-@import './grid.css';
+@import './local.css';
 
 /* Utilitaire */
 .is-hidden { display: none !important; }
 
-/* Conteneur principal centré */
+/* Conteneur principal */
 .multiplayer-container {
     max-width: 600px;
     margin: 0 auto;
     padding: 2rem;
 }
 
-/* Boîte pour les informations de connexion */
+/* Connexion */
 .game-setup-box {
     border: 1px solid var(--menu-shadow);
     background: var(--menu-bg);
@@ -104,9 +104,9 @@
     padding: 0.5rem 1.5rem;
 }
 .game-code-display:hover {
-    border-color: var(--blue);
-    background: var(--hover-bg);
     transform: translateY(-1px);
+    background: var(--hover-bg);
+    border-color: var(--blue);
     box-shadow: 0 4px 8px #00000026;
 }
 .game-code-display:active {
