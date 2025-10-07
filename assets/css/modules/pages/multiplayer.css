@@ -188,6 +188,7 @@
 .msg--win { background: #27ae60; }
 .msg--lose { background: #e74c3c; }
 .msg--draw { background: #f39c12; }
+.msg--spectator { background: #3498db; }
 
 /* Loading dots animation */
 .loading-dots {
@@ -202,4 +203,86 @@
 }
 .loading-dots span:nth-child(2) {
     animation-delay: -0.16s;
+}
+
+/* Liste des parties publiques */
+.game-list-container { text-align: center; }
+.game-list {
+    margin: 2rem auto;
+    max-width: 800px;
+    padding: 1rem;
+}
+
+.game-item {
+    background: var(--menu-bg);
+    border: 1px solid var(--menu-shadow);
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    align-items: center;
+    display: flex;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+.game-item:hover {
+    box-shadow: 0 4px 8px #00000026;
+    transform: translateY(-2px);
+}
+
+.game-item-info {
+    color: var(--bg-invert);
+    align-items: center;
+    flex-wrap: wrap;
+    display: flex;
+    gap: 1.5rem;
+}
+.game-item-info strong {
+    color: var(--blue);
+    font-size: 1.1rem;
+}
+.game-item-info span {
+    color: var(--menu-chat-color);
+    font-size: 0.9rem;
+}
+
+.status-ready {
+    color: #27ae60 !important;
+    font-weight: 600;
+}
+.status-waiting {
+    color: #f39c12 !important;
+    font-weight: 600;
+}
+
+.game-list-btn {
+    color: var(--blue);
+    border: 2px solid var(--blue);
+    transition: all 0.3s ease;
+    background: transparent;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 0.65rem 1.5rem;
+}
+.game-list-btn:hover {
+    transform: translateY(-2px);
+    background: var(--blue);
+    color: white;
+}
+
+.game-field .checkbox {
+    color: var(--menu-chat-color);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+.game-field .checkbox input[type="checkbox"] {
+    cursor: pointer;
+    height: auto;
+    width: auto;
 }

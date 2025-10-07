@@ -2,8 +2,6 @@ import { updateCellClass, clearBoard, updateStatus } from './modules/board.js';
 
 class Multiplayer {
     constructor() {
-        this.username = '';
-        this.gameCode = '';
         this.sessionId = '';
         this.isMyTurn = false;
         this.gameStarted = false;
@@ -14,6 +12,7 @@ class Multiplayer {
         this.moves = [];
         this.foundMessageShown = false;
         this.isCopying = false;
+        this.spectator = false;
 
         this.initializeElements();
         this.bindEvents();
@@ -21,8 +20,9 @@ class Multiplayer {
     }
 
     initializeElements() {
-        this.username = document.getElementById('username');
-        this.code = document.getElementById('gameCode');
+        this.user = document.getElementById('user');
+        this.code = document.getElementById('code');
+        this.private = document.getElementById('private');
         this.startBtn = document.getElementById('startGame');
         this.setup = document.getElementById('gameSetup');
 
@@ -33,6 +33,11 @@ class Multiplayer {
         this.codeDisplay = document.getElementById('gameCodeDisplay');
         this.result = document.querySelector('.game-result');
         this.board = document.querySelector('.board');
+
+        this.gameList = document.getElementById('gameList');
+        this.publicList = document.getElementById('publicList');
+        this.listBtn = document.getElementById('listBtn');
+        this.backBtn = document.getElementById('backBtn');
     }
 
     bindEvents() {
@@ -50,7 +55,7 @@ class Multiplayer {
             cell.addEventListener('click', (e) => this.handleCellClick(e));
         });
 
-        this.username.addEventListener('keypress', (e) => {
+        this.user.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.startGame();
         });
         this.code.addEventListener('keypress', (e) => {
@@ -58,6 +63,16 @@ class Multiplayer {
         });
 
         this.code.addEventListener('input', () => this.updateButtonText());
+
+        this.listBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showPublicGames();
+        });
+
+        this.backBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.hidePublicGames();
+        });
 
         this.updateButtonText();
     }
@@ -79,7 +94,7 @@ class Multiplayer {
         }
 
         if (savedUsername) {
-            this.username.value = savedUsername;
+            this.user.value = savedUsername;
         }
 
         if (gameCode && savedUsername) {
@@ -89,12 +104,12 @@ class Multiplayer {
 
     updateUrl() {
         const url = new URL(window.location);
-        url.searchParams.set('c', this.gameCode);
+        url.searchParams.set('c', this.code.value);
         window.history.replaceState({}, '', url);
     }
 
     shareGame() {
-        const textToCopy = this.gameCode;
+        const textToCopy = this.code.value;
         this.isCopying = true;
         const originalText = this.codeDisplay.textContent;
 
@@ -121,24 +136,17 @@ class Multiplayer {
     }
 
     async startGame() {
-        const username = this.username.value.trim();
+        const username = this.user.value.trim();
         const gameCode = this.code.value.trim();
 
-        if (!username) {
-            this.username.style.borderColor = '#ff4444';
-            this.username.focus();
-            return;
-        }
+        if (!username) return this.user.focus();
 
-        this.username = username;
-        this.gameCode = gameCode;
-
-        const storedSessionId = localStorage.getItem(this.username.toLowerCase());
+        const storedSessionId = localStorage.getItem(username);
         if (storedSessionId) {
             this.sessionId = storedSessionId;
         } else {
             this.sessionId = this.generateSessionId();
-            localStorage.setItem(this.username.toLowerCase(), this.sessionId);
+            localStorage.setItem(this.user.value, this.sessionId);
         }
 
         localStorage.setItem('username', username);
@@ -182,7 +190,7 @@ class Multiplayer {
     showGameBoard() {
         this.setup.classList.add('is-hidden');
         this.game.classList.remove('is-hidden');
-        if (this.gameCode) this.codeDisplay.textContent = this.gameCode;
+        if (this.code.value) this.codeDisplay.textContent = this.code.value;
     }
 
     backToSetup() {
@@ -195,7 +203,8 @@ class Multiplayer {
     resetGame() {
         this.stopPolling();
         this.resetGameState();
-        window.location.href = '/multiplayer';
+        this.clearBoardUI();
+        this.backToSetup();
     }
 
     resetGameState() {
@@ -240,7 +249,7 @@ class Multiplayer {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `username=${encodeURIComponent(this.username.toLowerCase())}&move=${position}&session=${this.sessionId}&game=${this.gameCode}`
+                body: `username=${encodeURIComponent(this.user.value)}&move=${position}&session=${this.sessionId}&game=${this.code.value}`
             });
 
             const data = await response.json();
@@ -260,12 +269,13 @@ class Multiplayer {
 
     async fetchGameState() {
         try {
+            const isPrivate = this.private?.checked ? 'true' : '';
             const response = await fetch('https://api.sylvain.pro/v3/tic-tac-toe/fetch', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `username=${encodeURIComponent(this.username.toLowerCase())}&game=${this.gameCode}`
+                body: `username=${encodeURIComponent(this.user.value)}&game=${this.code.value}${isPrivate ? '&private=true' : ''}`
             });
 
             const data = await response.json();
@@ -280,12 +290,12 @@ class Multiplayer {
         if (!gameData) return;
 
         if (gameData.id) {
-            if (!this.gameCode) {
-                this.gameCode = gameData.id;
+            if (!this.code.value) {
+                this.code.value = gameData.id;
                 this.updateUrl();
             }
             if (this.codeDisplay && !this.isCopying) {
-                this.codeDisplay.textContent = this.gameCode;
+                this.codeDisplay.textContent = this.code.value;
             }
         }
 
@@ -304,7 +314,7 @@ class Multiplayer {
         const connectedPlayers = gameData.players;
         const players = Object.keys(movesByPlayer);
 
-        const isSpectator = connectedPlayers.length > 2 && !connectedPlayers.slice(0, 2).includes(this.username.toLowerCase());
+        this.spectator = connectedPlayers.length > 2 && !connectedPlayers.slice(0, 2).includes(this.user.value);
 
         if (connectedPlayers.length < 2) {
             this.isMyTurn = false;
@@ -313,44 +323,46 @@ class Multiplayer {
             updateStatus(this.status, 'En attente d\'un autre joueur...');
             this.updateBoardHover(false);
         } else if (players.length === 0) {
-            this.isMyTurn = connectedPlayers[0] === this.username.toLowerCase();
+            this.isMyTurn = connectedPlayers[0] === this.user.value;
             this.mySymbol = this.isMyTurn ? 'x' : 'o';
             this.opponentSymbol = this.isMyTurn ? 'o' : 'x';
 
-            if (isSpectator) {
+            if (this.spectator) {
                 updateStatus(this.status, `Tour de ${connectedPlayers[0]} (X)`);
+            } else if (this.isMyTurn) {
+                updateStatus(this.status, 'À votre tour !');
             } else {
-                updateStatus(this.status, this.isMyTurn ? 'À votre tour !' : 'En attente du joueur adverse...');
+                updateStatus(this.status, `En attente du premier coup de ${connectedPlayers[0]}...`);
             }
-            this.updateBoardHover(isSpectator);
+            this.updateBoardHover(this.spectator);
         } else if (players.length === 1) {
-            if (players[0] === this.username.toLowerCase()) {
+            if (players[0] === this.user.value) {
                 this.isMyTurn = false;
                 this.mySymbol = 'x';
                 this.opponentSymbol = 'o';
-                if (isSpectator) {
+                if (this.spectator) {
                     updateStatus(this.status, `Tour de ${connectedPlayers[1]} (O)`);
                 } else {
                     updateStatus(this.status, 'En attente du joueur adverse...');
                 }
-                this.updateBoardHover(isSpectator);
+                this.updateBoardHover(this.spectator);
             } else {
-                this.isMyTurn = !isSpectator;
+                this.isMyTurn = !this.spectator;
                 this.mySymbol = 'o';
                 this.opponentSymbol = 'x';
-                if (isSpectator) {
+                if (this.spectator) {
                     updateStatus(this.status, `Tour de ${connectedPlayers[1]} (O)`);
                 } else {
                     updateStatus(this.status, 'À votre tour !');
                 }
-                this.updateBoardHover(isSpectator);
+                this.updateBoardHover(this.spectator);
             }
         } else {
-            const myMoves = movesByPlayer[this.username.toLowerCase()] || [];
-            const opponentName = players.find(p => p !== this.username.toLowerCase());
+            const myMoves = movesByPlayer[this.user.value] || [];
+            const opponentName = players.find(p => p !== this.user.value);
             const opponentMoves = movesByPlayer[opponentName] || [];
 
-            if (players[0] === this.username.toLowerCase()) {
+            if (players[0] === this.user.value) {
                 this.mySymbol = 'x';
                 this.opponentSymbol = 'o';
             } else {
@@ -359,15 +371,15 @@ class Multiplayer {
             }
 
             let currentTurnIsX;
-            if (players[0] === this.username.toLowerCase()) {
+            if (players[0] === this.user.value) {
                 currentTurnIsX = myMoves.length <= opponentMoves.length;
-                this.isMyTurn = !isSpectator && currentTurnIsX;
+                this.isMyTurn = !this.spectator && currentTurnIsX;
             } else {
                 currentTurnIsX = opponentMoves.length <= myMoves.length;
-                this.isMyTurn = !isSpectator && !currentTurnIsX;
+                this.isMyTurn = !this.spectator && !currentTurnIsX;
             }
 
-            if (isSpectator) {
+            if (this.spectator) {
                 const currentPlayer = currentTurnIsX ? connectedPlayers[0] : connectedPlayers[1];
                 const currentSymbol = currentTurnIsX ? 'X' : 'O';
                 updateStatus(this.status, `Tour de ${currentPlayer} (${currentSymbol})`);
@@ -376,7 +388,7 @@ class Multiplayer {
             }
         }
 
-        this.updateBoardHover(isSpectator);
+        this.updateBoardHover(this.spectator);
 
         if (gameData.winner) {
             this.handleGameEnd(gameData.winner);
@@ -405,12 +417,12 @@ class Multiplayer {
         });
     }
 
-    updateBoardHover(isSpectator) {
+    updateBoardHover(spectator) {
         if (!this.board) return;
 
         this.board.classList.remove('player-o', 'spectator');
 
-        if (isSpectator) {
+        if (spectator) {
             this.board.classList.add('spectator');
         } else if (this.isMyTurn && this.mySymbol === 'o') {
             this.board.classList.add('player-o');
@@ -421,25 +433,43 @@ class Multiplayer {
         this.gameEnded = true;
         this.stopPolling();
 
-        let messageClass;
-
-        if (result === 'tie') {
-            messageClass = 'msg--draw';
-        } else if (result === this.username.toLowerCase() || result === this.username) {
-            messageClass = 'msg--win';
-        } else {
-            messageClass = 'msg--lose';
-        }
-
-        updateStatus(this.status, 'Partie terminée');
-        this.result.classList.remove('is-hidden');
-
         this.result.querySelectorAll('.msg').forEach(msg => {
             msg.style.display = 'none';
         });
 
-        const targetMsg = this.result.querySelector(`.${messageClass}`);
-        if (targetMsg) targetMsg.style.display = 'block';
+        if (this.spectator) {
+            if (result === 'tie') {
+                updateStatus(this.status, 'Partie terminée - Égalité !');
+                const drawMsg = this.result.querySelector('.msg--draw');
+                if (drawMsg) drawMsg.style.display = 'block';
+            } else {
+                const winnerName = result.charAt(0).toUpperCase() + result.slice(1);
+                updateStatus(this.status, `${winnerName} a gagné !`);
+                let spectatorMsg = this.result.querySelector('.msg--spectator');
+                if (!spectatorMsg) {
+                    spectatorMsg = document.createElement('span');
+                    spectatorMsg.className = 'msg msg--spectator';
+                    this.result.appendChild(spectatorMsg);
+                }
+                spectatorMsg.textContent = `${winnerName} a gagné !`;
+                spectatorMsg.style.display = 'block';
+            }
+        } else {
+            let messageClass;
+            if (result === 'tie') {
+                messageClass = 'msg--draw';
+            } else if (result === this.user.value) {
+                messageClass = 'msg--win';
+            } else {
+                messageClass = 'msg--lose';
+            }
+
+            updateStatus(this.status, 'Partie terminée');
+            const targetMsg = this.result.querySelector(`.${messageClass}`);
+            if (targetMsg) targetMsg.style.display = 'block';
+        }
+
+        this.result.classList.remove('is-hidden');
     }
 
     startPolling() {
@@ -461,6 +491,73 @@ class Multiplayer {
 
     generateSessionId() {
         return Math.random().toString(36).substring(2) + Date.now().toString(36);
+    }
+
+    async showPublicGames() {
+        if (!this.user.value.trim()) return this.user.focus();
+
+        this.setup.classList.add('is-hidden');
+        this.gameList.classList.remove('is-hidden');
+
+        const games = await this.fetchPublicGames();
+        this.displayPublicGames(games);
+    }
+
+    hidePublicGames() {
+        this.gameList.classList.add('is-hidden');
+        this.setup.classList.remove('is-hidden');
+    }
+
+    async fetchPublicGames() {
+        try {
+            const response = await fetch('https://api.sylvain.pro/v3/tic-tac-toe/list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+
+            const data = await response.json();
+            return data.games || [];
+        } catch (error) {
+            console.error('Erreur lors de la récupération des parties publiques:', error);
+            return [];
+        }
+    }
+
+    displayPublicGames(games) {
+        if (!this.publicList) return;
+        if (games.length === 0) return this.publicList.innerHTML = '<p class="has-text-centered">Aucune partie publique disponible pour le moment.</p>';
+
+        this.publicList.innerHTML = games.map(game => `
+            <div class="game-item">
+                <div class="game-item-info">
+                    <strong>Code: ${game.id}</strong>
+                    <span>${game.playersCount}/2 joueurs</span>
+                    <span>${game.moves} coups</span>
+                    <span class="${game.status === 'ready' ? 'status-ready' : 'status-waiting'}">
+                        ${game.status === 'ready' ? 'En cours' : 'En attente'}
+                    </span>
+                </div>
+                <button type="button" class="btn" data-game-id="${game.id}">
+                    ${game.playersCount >= 2 ? 'Regarder' : 'Rejoindre'}
+                </button>
+            </div>
+        `).join('');
+
+        this.publicList.querySelectorAll('.btn[data-game-id]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.joinGame(btn.dataset.gameId);
+            });
+        });
+    }
+
+    joinGame(gameId) {
+        this.code.value = gameId;
+        this.updateButtonText();
+        this.hidePublicGames();
+
+        setTimeout(() => this.startGame(), 100);
     }
 }
 

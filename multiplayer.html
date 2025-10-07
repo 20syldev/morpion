@@ -34,15 +34,23 @@
                     <div class="game-setup-box">
                         <div class="game-field">
                             <label>Votre nom d'utilisateur</label>
-                            <input type="text" placeholder="Entrez votre nom" maxlength="20" id="username">
+                            <input type="text" placeholder="Entrez votre nom" maxlength="20" id="user">
                         </div>
 
                         <div class="game-field">
                             <label>Code de la partie (optionnel)</label>
-                            <input type="text" placeholder="Ex: AB123" maxlength="6" id="gameCode">
+                            <input type="text" placeholder="Ex: AB123" maxlength="6" id="code">
+                        </div>
+
+                        <div class="game-field">
+                            <label class="checkbox">
+                                <input type="checkbox" id="private">
+                                Partie privée (non visible dans la liste publique)
+                            </label>
                         </div>
 
                         <button class="game-start-btn" type="button" id="startGame">Commencer à jouer</button>
+                        <button class="game-list-btn" type="button" id="listBtn">Voir les parties publiques</button>
                     </div>
                 </div>
 
@@ -95,6 +103,7 @@
                         <span class="msg msg--win">Vous avez gagné !</span>
                         <span class="msg msg--lose">Vous avez perdu !</span>
                         <span class="msg msg--draw">Égalité !</span>
+                        <span class="msg msg--spectator"></span>
                     </div>
 
                     <div class="game-actions">
@@ -104,6 +113,20 @@
                                 <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
                             </span></span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Liste des parties publiques -->
+                <div class="game-list-container is-hidden" id="gameList">
+                    <h2 class="title has-text-centered mt-6">Parties publiques disponibles</h2>
+                    <p class="subtitle has-text-centered">Rejoignez une partie en cours ou en attente de joueurs</p>
+
+                    <div class="game-list" id="publicList">
+                        <p class="has-text-centered">Chargement des parties...</p>
+                    </div>
+
+                    <div class="game-actions mt-4">
+                        <button class="btn btn-secondary" type="button" id="backBtn">Retour</button>
                     </div>
                 </div>
             </div>
