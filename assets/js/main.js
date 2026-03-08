@@ -216,7 +216,7 @@ class Morpion {
 
     async makeMove(position) {
         try {
-            const response = await fetch('https://api.sylvain.pro/v3/tic-tac-toe', {
+            const response = await fetch('https://api.sylvain.sh/v3/tic-tac-toe', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -241,7 +241,7 @@ class Morpion {
 
     async fetchGameState() {
         try {
-            const response = await fetch('https://api.sylvain.pro/v3/tic-tac-toe/fetch', {
+            const response = await fetch('https://api.sylvain.sh/v3/tic-tac-toe/fetch', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

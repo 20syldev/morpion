@@ -1,4 +1,4 @@
-name: Deploy morpion.sylvain.pro
+name: Deploy morpion.sylvain.sh
 
 on:
   push:
